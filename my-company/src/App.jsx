@@ -7,11 +7,7 @@ import WelcomeMessage from './components/WelcomeMessage';
 function App() {
   return (
     <>
-      <Header />
-      <WelcomeMessage />
-      <MainContent />
-      <UserProfile name="Alice" age="25" bio="Loves hiking and photography" />
-      <Footer />
+    
     </>
   );
 }
