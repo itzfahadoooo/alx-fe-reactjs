@@ -1,6 +1,6 @@
 function MainContent() {
   return (
-    <main>
+    <main style={{ backgroundColor: '#f0f0f0', padding: '20px' }}>
       <p>I love to visit New York, Paris, and Tokyo.</p>
     </main>
   );
