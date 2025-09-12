@@ -1,3 +1,5 @@
+import { create } from "zustand";
+
 export const useRecipeStore = create((set) => ({
   recipes: [],
   searchTerm: "",
@@ -39,3 +41,4 @@ export const useRecipeStore = create((set) => ({
       return { recommendations: recommended };
     }),
 }));
+
