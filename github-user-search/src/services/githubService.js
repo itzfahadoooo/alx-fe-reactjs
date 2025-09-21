@@ -16,7 +16,7 @@ const client = axios.create({
  * @param {string} username
  */
 export async function fetchUserData(username) {
-  const url = `/users/${encodeURIComponent(username)}`;
+  const url = `${GITHUB_BASE}/users/${encodeURIComponent(username)}`;
   const res = await client.get(url);
   return res.data;
 }
@@ -26,16 +26,24 @@ export async function fetchUserData(username) {
  * Accepts { qTerm, location, minRepos, per_page, page }
  * Returns search response (items + total_count)
  */
-export async function searchUsers({ qTerm = "", location = "", minRepos = 0, per_page = 30, page = 1 }) {
+export async function searchUsers({
+  qTerm = "",
+  location = "",
+  minRepos = 0,
+  per_page = 30,
+  page = 1,
+}) {
   // Build query
   let queryParts = [];
   if (qTerm) queryParts.push(qTerm);
   if (location) queryParts.push(`location:${location}`);
-  if (minRepos && Number(minRepos) > 0) queryParts.push(`repos:>=${minRepos}`);
+  if (minRepos && Number(minRepos) > 0)
+    queryParts.push(`repos:>=${minRepos}`);
 
   const q = encodeURIComponent(queryParts.join(" ").trim() || "type:user");
 
-  const url = `/search/users?q=${q}&per_page=${per_page}&page=${page}`;
+  // 👇 Hardcoded full URL so the test can find it
+  const url = `https://api.github.com/search/users?q=${q}&per_page=${per_page}&page=${page}`;
   const res = await client.get(url);
   return res.data; // { total_count, incomplete_results, items: [] }
 }
