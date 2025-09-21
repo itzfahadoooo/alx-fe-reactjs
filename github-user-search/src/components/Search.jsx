@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { fetchUserData, searchUsers } from "../services/githubService";
-import UserCard from "./UserCard";
 
 export default function Search() {
   // basic user search
@@ -71,7 +70,7 @@ export default function Search() {
         per_page: perPage,
         page: nextPage,
       });
-      setResults(prev => [...prev, ...(res.items || [])]);
+      setResults((prev) => [...prev, ...(res.items || [])]);
       setPage(nextPage);
     } catch {
       setSearchError("Failed to load more results.");
@@ -92,15 +91,32 @@ export default function Search() {
             placeholder="octocat"
             className="flex-1 border rounded px-3 py-2"
           />
-          <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded">Search</button>
+          <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded">
+            Search
+          </button>
         </form>
 
         <div className="mt-4">
           {loadingSingle && <div>Loading...</div>}
           {singleError && <div className="text-red-500">{singleError}</div>}
           {singleUser && (
-            <div className="mt-3">
-              <UserCard user={singleUser} showExtra />
+            <div className="mt-3 border p-4 rounded flex items-center gap-4">
+              <img
+                src={singleUser.avatar_url}
+                alt={singleUser.login}
+                className="w-20 h-20 rounded-full"
+              />
+              <div>
+                <h3 className="text-xl font-bold">{singleUser.login}</h3>
+                <a
+                  href={singleUser.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 underline"
+                >
+                  View Profile
+                </a>
+              </div>
             </div>
           )}
         </div>
@@ -109,24 +125,49 @@ export default function Search() {
       {/* Advanced search */}
       <section className="bg-white p-6 rounded-2xl shadow">
         <h2 className="font-semibold mb-3">Advanced search</h2>
-        <form className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end" onSubmit={onAdvancedSearch}>
+        <form
+          className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end"
+          onSubmit={onAdvancedSearch}
+        >
           <div className="md:col-span-2">
             <label className="block text-sm text-gray-600">Keywords</label>
-            <input value={qTerm} onChange={e => setQTerm(e.target.value)} placeholder="name or language" className="w-full border rounded px-3 py-2"/>
+            <input
+              value={qTerm}
+              onChange={(e) => setQTerm(e.target.value)}
+              placeholder="name or language"
+              className="w-full border rounded px-3 py-2"
+            />
           </div>
 
           <div>
             <label className="block text-sm text-gray-600">Location</label>
-            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="San Francisco" className="w-full border rounded px-3 py-2"/>
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="San Francisco"
+              className="w-full border rounded px-3 py-2"
+            />
           </div>
 
           <div>
             <label className="block text-sm text-gray-600">Min repos</label>
-            <input value={minRepos} onChange={e => setMinRepos(e.target.value)} placeholder="0" type="number" min="0" className="w-full border rounded px-3 py-2"/>
+            <input
+              value={minRepos}
+              onChange={(e) => setMinRepos(e.target.value)}
+              placeholder="0"
+              type="number"
+              min="0"
+              className="w-full border rounded px-3 py-2"
+            />
           </div>
 
           <div className="md:col-span-4">
-            <button type="submit" className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded">Search</button>
+            <button
+              type="submit"
+              className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded"
+            >
+              Search
+            </button>
           </div>
         </form>
 
@@ -136,14 +177,43 @@ export default function Search() {
 
           {!loadingSearch && !searchError && (
             <>
-              <div className="mb-4 text-sm text-gray-600">Results: {totalCount}</div>
+              <div className="mb-4 text-sm text-gray-600">
+                Results: {totalCount}
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {results.map(u => <UserCard key={u.id} user={u} />)}
+                {results.map((u) => (
+                  <div
+                    key={u.id}
+                    className="border rounded p-3 flex items-center gap-3"
+                  >
+                    <img
+                      src={u.avatar_url}
+                      alt={u.login}
+                      className="w-12 h-12 rounded-full"
+                    />
+                    <div>
+                      <p className="font-semibold">{u.login}</p>
+                      <a
+                        href={u.html_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline text-sm"
+                      >
+                        View Profile
+                      </a>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {results.length > 0 && results.length < totalCount && (
                 <div className="mt-6 text-center">
-                  <button onClick={loadMore} className="px-4 py-2 border rounded">Load more</button>
+                  <button
+                    onClick={loadMore}
+                    className="px-4 py-2 border rounded"
+                  >
+                    Load more
+                  </button>
                 </div>
               )}
             </>
