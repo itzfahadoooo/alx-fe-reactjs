@@ -5,29 +5,50 @@ function AddRecipeForm() {
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+
+  // Validation function
+  const validate = () => {
+    const newErrors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "⚠️ Recipe title is required.";
+    }
+
+    if (!ingredients.trim()) {
+      newErrors.ingredients = "⚠️ Ingredients are required.";
+    } else if (ingredients.split("\n").length < 2) {
+      newErrors.ingredients = "⚠️ Please add at least 2 ingredients.";
+    }
+
+    if (!steps.trim()) {
+      newErrors.steps = "⚠️ Preparation steps are required.";
+    }
+
+    setErrors(newErrors);
+
+    // return true if no errors
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!title || !ingredients || !steps) {
-      setError("⚠️ All fields are required.");
-      return;
-    }
-    if (ingredients.split("\n").length < 2) {
-      setError("⚠️ Please add at least 2 ingredients.");
-      return;
-    }
+    if (!validate()) return;
 
-    setError("");
-    const newRecipe = { title, ingredients, steps };
-    console.log("Recipe submitted:", newRecipe);
+    const newRecipe = {
+      title,
+      ingredients: ingredients.split("\n"),
+      instructions: steps.split("\n"),
+    };
+
+    console.log("✅ Recipe submitted:", newRecipe);
 
     // Clear form after submit
     setTitle("");
     setIngredients("");
     setSteps("");
+    setErrors({});
   };
 
   return (
@@ -39,12 +60,6 @@ function AddRecipeForm() {
       <div className="bg-white rounded-xl shadow-md p-6 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">➕ Add a New Recipe</h1>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block font-medium mb-1">Recipe Title</label>
@@ -52,9 +67,14 @@ function AddRecipeForm() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-green-400"
+              className={`w-full border rounded-lg p-2 focus:ring-2 ${
+                errors.title ? "border-red-500" : "focus:ring-green-400"
+              }`}
               placeholder="Enter recipe title"
             />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            )}
           </div>
 
           <div>
@@ -62,10 +82,15 @@ function AddRecipeForm() {
             <textarea
               value={ingredients}
               onChange={(e) => setIngredients(e.target.value)}
-              className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-green-400"
+              className={`w-full border rounded-lg p-2 focus:ring-2 ${
+                errors.ingredients ? "border-red-500" : "focus:ring-green-400"
+              }`}
               rows="4"
               placeholder="List ingredients (one per line)"
             />
+            {errors.ingredients && (
+              <p className="text-red-500 text-sm mt-1">{errors.ingredients}</p>
+            )}
           </div>
 
           <div>
@@ -73,10 +98,15 @@ function AddRecipeForm() {
             <textarea
               value={steps}
               onChange={(e) => setSteps(e.target.value)}
-              className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-green-400"
+              className={`w-full border rounded-lg p-2 focus:ring-2 ${
+                errors.steps ? "border-red-500" : "focus:ring-green-400"
+              }`}
               rows="5"
-              placeholder="Describe the steps"
+              placeholder="Describe the steps (one per line)"
             />
+            {errors.steps && (
+              <p className="text-red-500 text-sm mt-1">{errors.steps}</p>
+            )}
           </div>
 
           <button
