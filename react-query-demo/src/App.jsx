@@ -1,11 +1,16 @@
 import React from "react";
-import UserList from "./components/UserList";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import PostsComponent from "./components/PostsComponent";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <UserList />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <PostsComponent />
+      </div>
+    </QueryClientProvider>
   );
 }
 
