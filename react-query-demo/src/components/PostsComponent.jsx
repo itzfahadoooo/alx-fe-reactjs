@@ -1,44 +1,28 @@
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 
-// Fetch posts
 const fetchPosts = async () => {
   const res = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=5");
   if (!res.ok) throw new Error("Failed to fetch posts");
   return res.json();
 };
 
-// Add a new post
-const addPost = async (newPost) => {
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newPost),
-  });
-  if (!res.ok) throw new Error("Failed to add post");
-  return res.json();
-};
-
 export default function PostsComponent() {
-  const queryClient = useQueryClient();
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-
-  // Fetch posts
-  const { data: posts, isLoading, isError, error } = useQuery({
+  const {
+    data: posts,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
-  });
-
-  // Mutation for adding a post
-  const mutation = useMutation({
-    mutationFn: addPost,
-    onSuccess: (newPost) => {
-      // Update cache
-      queryClient.setQueryData(["posts"], (old) => [...old, newPost]);
-      setTitle("");
-      setBody("");
-    },
+    // ✅ Required configuration
+    cacheTime: 1000 * 60 * 5, // keep data in cache for 5 minutes
+    staleTime: 1000 * 30, // data considered fresh for 30 seconds
+    refetchOnWindowFocus: false, // don’t refetch when tab regains focus
+    keepPreviousData: true, // keep previous data during refetch
   });
 
   if (isLoading) return <p>Loading posts...</p>;
@@ -48,39 +32,12 @@ export default function PostsComponent() {
     <div className="max-w-xl mx-auto mt-10 p-4 border rounded-lg shadow">
       <h2 className="text-2xl font-bold text-center mb-4">Posts</h2>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!title || !body) return alert("Please fill all fields");
-          mutation.mutate({ title, body, userId: 1 });
-        }}
-        className="space-y-3 mb-5"
+      <button
+        onClick={() => refetch()}
+        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        <input
-          type="text"
-          placeholder="Post title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <textarea
-          placeholder="Post body"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <button
-          type="submit"
-          disabled={mutation.isPending}
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          {mutation.isPending ? "Adding..." : "Add Post"}
-        </button>
-      </form>
-
-      {mutation.isError && (
-        <p className="text-red-500">{mutation.error.message}</p>
-      )}
+        {isFetching ? "Refreshing..." : "Refetch Posts"}
+      </button>
 
       <ul className="space-y-2">
         {posts.map((post) => (
